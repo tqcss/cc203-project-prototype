@@ -124,6 +124,22 @@ class Lecturer : public User {
 };
 
 
+class Section {
+public:
+    static std::unique_ptr<std::vector<Section*>> sections;
+};
+std::unique_ptr<std::vector<Section*>> Section::sections = std::make_unique<std::vector<Section*>>();
+
+
+std::string capitalize(const std::string &str) {
+    std::string result;
+    for (const char &letter : str) {
+        result += std::toupper(letter);
+    }
+    return result;
+}
+
+template<typename ... Args>
 std::string concat(Args&&...args)
 {
     std::stringstream ss;
