@@ -1,0 +1,3 @@
+C:/Users/Client/CLionProjects/cc203-project-prototype/cmake-build-debug/CMakeFiles/cc203_project_prototype.dir
+C:/Users/Client/CLionProjects/cc203-project-prototype/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Client/CLionProjects/cc203-project-prototype/cmake-build-debug/CMakeFiles/rebuild_cache.dir
