@@ -7,6 +7,8 @@
 #include <ctime>
 
 
+// ENUMS:
+
 enum Gender {
     Male,
     Female
@@ -30,16 +32,21 @@ enum College {
     PESCAR
 };
 
-// FUNCTION FORWARD DECLARATION
+
+// FUNCTION FORWARD DECLARATION:
+
 std::string capitalize(const std::string &str);
 template<typename ... Args>
 std::string concat(Args&&...args);
 
-// CLASS FORWARD DECLARATION
+
+// CLASS FORWARD DECLARATION:
+
 class Section;
 
 
 // CLASS DEFINITIONS
+
 // User -> Base class for Student and Lecturer
 class User {
 private:
@@ -101,7 +108,6 @@ public:
             const std::string &extension = "")
         : _id(capitalize(id)),
           isRegularStudent(isRegular),
-          section(section),
           User(college, gender, lastName, firstName, middleInitial, extension) {
         
         students->emplace(id, this);
@@ -114,7 +120,9 @@ public:
 
     std::string getId() const { return _id; }
 
-    void setId(const std::string id);
+    void setId(const std::string &id) {
+        _id = capitalize(id);
+    };
 };
 std::unique_ptr<std::unordered_map<std::string, Student*>> Student::students = std::make_unique<std::unordered_map<std::string, Student*>>();
 
@@ -124,13 +132,97 @@ class Lecturer : public User {
 };
 
 
+class Student;
 class Section {
+private:
+    std::string _program;
+    char _section;
+
 public:
     static std::unique_ptr<std::vector<Section*>> sections;
+    std::vector<Student*> students;
+    unsigned short year;
+
+    Section(const std::string &program,
+            const unsigned short &year,
+            const char &section)
+        : _program(capitalize(program)), 
+          year(year),
+          _section(std::toupper(section)) {
+        
+        sections->push_back(this);
+    }
+
+    ~Section() {
+        for (int index = 0; index < sections->size(); index++) {
+            if (sections->at(index) != this) continue;
+            sections->erase(sections->begin() + index);
+            return;
+        }
+    }
+
+    std::string getName() {
+        return concat(_program, " ", year, "-", _section);
+    }
+
+    // FUNCTION NOT TESTED
+    void addStudent(const std::string &studentId) {
+        if (Student::students->find(studentId) == Student::students->end()) {
+            throw std::invalid_argument(concat("Student with the id: '", studentId, "' not found."));
+        }
+        Student &student = *(Student::students->at(studentId));
+        students.push_back(&student);
+        student.section = this;
+    }
+
+    void addStudent(Student *student) {
+        if (student == nullptr) {
+            throw std::invalid_argument("Passed in argument must not be a nullptr.");
+        }
+        students.push_back(student);
+        student->section = this;
+        student = nullptr;
+    }
+
+    void removeStudent(std::string &studentId) {
+        for (int index = 0; index < students.size(); index++) {
+            if (studentId != students.at(index)->getId()) continue;
+
+            students.at(index) = nullptr;
+            students.erase(students.begin() + index);
+            return;
+        }
+        throw std::invalid_argument(concat("Student with id: '", studentId, "' was not found in section or doesn't exist."));
+    }
+
+    void removeStudent(Student *student) {
+        for (int index = 0; index = students.size(); index++) {
+            if (student != students.at(index)) continue;
+
+            students.at(index) = nullptr;
+            students.erase(students.begin() + index);
+            return;
+        }
+        throw std::invalid_argument("The student pointer that was passed was not found in section or doesn't exist.");
+    }
+
+    std::string getProgram() const { return _program; }
+    char getSection() const { return _section; }
+
+    void setProgram(const std::string program) { _program = capitalize(program); }
+    void setSection(const char section) { _section = std::toupper(section); }
 };
 std::unique_ptr<std::vector<Section*>> Section::sections = std::make_unique<std::vector<Section*>>();
 
 
+/**
+ * @brief Capitalizes each character in a string.
+ * 
+ * This function converts each character in the input string to its uppercase equivalent.
+ * 
+ * @param str The input string to capitalize.
+ * @return A new string with all characters capitalized.
+ */
 std::string capitalize(const std::string &str) {
     std::string result;
     for (const char &letter : str) {
@@ -139,6 +231,18 @@ std::string capitalize(const std::string &str) {
     return result;
 }
 
+
+/**
+ * @brief Concatenates multiple values into a single string.
+ * 
+ * This function concatenates multiple values into a single string using
+ * stream insertion (<<) operator. The values are forwarded and appended
+ * to a stringstream object.
+ * 
+ * @tparam Args The types of arguments to concatenate.
+ * @param args The arguments to concatenate.
+ * @return A string containing the concatenated values.
+ */
 template<typename ... Args>
 std::string concat(Args&&...args)
 {
@@ -148,7 +252,16 @@ std::string concat(Args&&...args)
 }
 
 int main() {
+    std::unique_ptr<Section> BSCS1A = std::make_unique<Section>("BSCS", 1, 'A');
+    std::unique_ptr<Student> me = std::make_unique<Student>("1815A0001", true, CON, BSCS1A.get(), Male, "Doe", "John", "A");
+    
+    BSCS1A->addStudent(me.get());
 
+    std::cout << "[ ";
+    for (Student* student : BSCS1A->students) {
+        std::cout << student->getId() << ' ';
+    }
+    std::cout << "]\n";
     return 0;
 }
 
