@@ -132,7 +132,21 @@ class Lecturer : public User {
 };
 
 
-class Student;
+// yet to be fully implemented
+class _Class {
+private:
+    std::string subjectCode;
+    std::string subjectName;
+public:
+    static std::unique_ptr<std::vector<_Class*>> classes;
+    std::vector<Student*> students;
+
+
+
+};
+std::unique_ptr<std::vector<_Class*>> _Class::classes = std::make_unique<std::vector<_Class*>>();
+
+
 class Section {
 private:
     std::string _program;
@@ -253,15 +267,17 @@ std::string concat(Args&&...args)
 
 int main() {
     std::unique_ptr<Section> BSCS1A = std::make_unique<Section>("BSCS", 1, 'A');
-    std::unique_ptr<Student> me = std::make_unique<Student>("1815A0001", true, CON, BSCS1A.get(), Male, "Doe", "John", "A");
+    std::unique_ptr<Student> me = std::make_unique<Student>("1815A0001", true, CICT, BSCS1A.get(), Male, "Doe", "John", "A");
     
     BSCS1A->addStudent(me.get());
 
-    std::cout << "[ ";
+    std::cout << "students of BSCS 1-A = [ ";
     for (Student* student : BSCS1A->students) {
         std::cout << student->getId() << ' ';
     }
     std::cout << "]\n";
+
+    std::cout << "Section of '" << me->getFullName() << "' is " << me->section->getName();
     return 0;
 }
 
