@@ -6,6 +6,8 @@
 #include <memory>
 #include <ctime>
 
+#include "../include/strmanip.h"
+
 
 // ENUMS:
 
@@ -31,13 +33,6 @@ enum College {
     CON,
     PESCAR
 };
-
-
-// FUNCTION FORWARD DECLARATION:
-
-std::string capitalize(const std::string &str);
-template<typename ... Args>
-std::string concat(Args&&...args);
 
 
 // CLASS FORWARD DECLARATION:
@@ -67,20 +62,20 @@ public:
         const std::string &extension)
     : college(college),
       gender(gender),
-      _lastName(capitalize(lastName)),
-      _firstName(capitalize(firstName)),
-      _middleInitial(capitalize(middleInitial)),
-      _extension(capitalize(extension)) {}
+      _lastName(toUppercase(lastName)),
+      _firstName(toUppercase(firstName)),
+      _middleInitial(toUppercase(middleInitial)),
+      _extension(toUppercase(extension)) {}
 
     std::string getLastName() const { return _lastName; }
     std::string getFirstName() const { return _firstName; }
     std::string getMiddleInitial() const { return _middleInitial; }
     std::string getExtension() const { return _extension; }
 
-    void setLastName(const std::string &name) { _lastName = capitalize(name); }
-    void setFirstName(const std::string &name) { _firstName = capitalize(name); }
-    void setMiddleInitial(const std::string &initial) { _middleInitial = capitalize(initial); }
-    void setExtension(const std::string &extension) { _extension = capitalize(extension); }
+    void setLastName(const std::string &name) { _lastName = toUppercase(name); }
+    void setFirstName(const std::string &name) { _firstName = toUppercase(name); }
+    void setMiddleInitial(const std::string &initial) { _middleInitial = toUppercase(initial); }
+    void setExtension(const std::string &extension) { _extension = toUppercase(extension); }
 
     std::string getFullName() {
         return concat(_lastName, ", ", _firstName, " ", _middleInitial, ".");
@@ -106,7 +101,7 @@ public:
             const std::string &firstName,
             const std::string &middleInitial,
             const std::string &extension = "")
-        : _id(capitalize(id)),
+        : _id(toUppercase(id)),
           isRegularStudent(isRegular),
           User(college, gender, lastName, firstName, middleInitial, extension) {
         
@@ -121,7 +116,7 @@ public:
     std::string getId() const { return _id; }
 
     void setId(const std::string &id) {
-        _id = capitalize(id);
+        _id = toUppercase(id);
     };
 };
 std::unique_ptr<std::unordered_map<std::string, Student*>> Student::students = std::make_unique<std::unordered_map<std::string, Student*>>();
@@ -160,7 +155,7 @@ public:
     Section(const std::string &program,
             const unsigned short &year,
             const char &section)
-        : _program(capitalize(program)), 
+        : _program(toUppercase(program)), 
           year(year),
           _section(std::toupper(section)) {
         
@@ -223,47 +218,11 @@ public:
     std::string getProgram() const { return _program; }
     char getSection() const { return _section; }
 
-    void setProgram(const std::string program) { _program = capitalize(program); }
+    void setProgram(const std::string program) { _program = toUppercase(program); }
     void setSection(const char section) { _section = std::toupper(section); }
 };
 std::unique_ptr<std::vector<Section*>> Section::sections = std::make_unique<std::vector<Section*>>();
 
-
-/**
- * @brief Capitalizes each character in a string.
- * 
- * This function converts each character in the input string to its uppercase equivalent.
- * 
- * @param str The input string to capitalize.
- * @return A new string with all characters capitalized.
- */
-std::string capitalize(const std::string &str) {
-    std::string result;
-    for (const char &letter : str) {
-        result += std::toupper(letter);
-    }
-    return result;
-}
-
-
-/**
- * @brief Concatenates multiple values into a single string.
- * 
- * This function concatenates multiple values into a single string using
- * stream insertion (<<) operator. The values are forwarded and appended
- * to a stringstream object.
- * 
- * @tparam Args The types of arguments to concatenate.
- * @param args The arguments to concatenate.
- * @return A string containing the concatenated values.
- */
-template<typename ... Args>
-std::string concat(Args&&...args)
-{
-    std::stringstream ss;
-    (ss << ... << std::forward<Args>(args));
-    return ss.str();
-}
 
 int main() {
     std::unique_ptr<Section> BSCS1A = std::make_unique<Section>("BSCS", 1, 'A');
@@ -280,4 +239,3 @@ int main() {
     std::cout << "Section of '" << me->getFullName() << "' is " << me->section->getName();
     return 0;
 }
-
